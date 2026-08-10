@@ -86,23 +86,6 @@ export default function Navbar({ onOpenTransaction, onOpenTransfer }) {
               </motion.div>
               <span>নতুন এন্ট্রি</span>
             </motion.button>
-
-            <div className="h-6 w-px bg-white/10 hidden sm:block" />
-
-            {/* Avatar */}
-            <motion.div
-              whileHover={{ scale: 1.06 }}
-              transition={{ type: 'spring', stiffness: 400 }}
-              className="flex items-center gap-2"
-            >
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md shadow-violet-500/30 ring-2 ring-white/10">
-                আ
-              </div>
-              <div className="hidden md:block">
-                <p className="text-xs font-bold text-white">আনাস</p>
-                <p className="text-[10px] text-white/40">Admin</p>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </motion.header>
