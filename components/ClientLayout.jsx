@@ -14,18 +14,10 @@ export default function ClientLayout({ children }) {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      if (process.env.NODE_ENV === 'production') {
-        navigator.serviceWorker
-          .register('/sw.js')
-          .then((reg) => console.log('PWA ServiceWorker registered:', reg.scope))
-          .catch((err) => console.log('ServiceWorker error:', err));
-      } else {
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          for (let registration of registrations) {
-            registration.unregister();
-          }
-        });
-      }
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((reg) => console.log('PWA ServiceWorker registered:', reg.scope))
+        .catch((err) => console.log('ServiceWorker error:', err));
     }
   }, []);
 
