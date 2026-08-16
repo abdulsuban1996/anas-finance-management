@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { StorageAdapter } from '../../lib/storage';
-import { PieChart as PieIcon, TrendingUp, TrendingDown, Download, BarChart2, Briefcase, FileSpreadsheet } from 'lucide-react';
+import { PieChart as PieIcon, TrendingUp, TrendingDown, Download, BarChart2, Briefcase, FileSpreadsheet, Image } from 'lucide-react';
 import { 
   ResponsiveContainer, 
   AreaChart, 
@@ -12,10 +12,33 @@ import {
   Tooltip, 
   PieChart, 
   Pie, 
-  Cell, 
-  BarChart, 
-  Bar 
+  Cell
 } from 'recharts';
+
+function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeColor) {
+  if (typeof radius === 'number') {
+    radius = { tl: radius, tr: radius, br: radius, bl: radius };
+  }
+  ctx.beginPath();
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + width - radius.tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+  ctx.lineTo(x + width, y + height - radius.br);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+  ctx.lineTo(x + radius.bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+  ctx.closePath();
+  if (fill) {
+    ctx.fill();
+  }
+  if (stroke) {
+    ctx.strokeStyle = strokeColor || '#CBD5E1';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+}
 
 export default function ReportsPage({ refreshKey }) {
   const [transactions, setTransactions] = useState([]);
@@ -43,6 +66,10 @@ export default function ReportsPage({ refreshKey }) {
     { month: 'জুলাই', income: 75000, expense: 42000 },
     { month: 'আগস্ট', income: 85000, expense: 33700 },
   ];
+
+  // Overall totals
+  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
   // Business segment Profit/Loss summary
   const businessTxs = transactions.filter(t => t.segment === 'business');
@@ -80,23 +107,195 @@ export default function ReportsPage({ refreshKey }) {
     document.body.removeChild(link);
   };
 
+  // Image Download Handler (High Quality PNG Canvas Generator)
+  const exportToImage = () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const width = 1200;
+    const height = 1500;
+    canvas.width = width;
+    canvas.height = height;
+
+    // Background Gradient (Dark Header + Soft Slate Body)
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#0a1628');
+    bgGradient.addColorStop(0.16, '#0f2040');
+    bgGradient.addColorStop(0.1601, '#F8F9FB');
+    bgGradient.addColorStop(1, '#F0F4F8');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // Accent line
+    ctx.fillStyle = '#10B981';
+    ctx.fillRect(0, 0, width, 10);
+
+    // Header Title & Subtitle
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 38px system-ui, -apple-system, sans-serif';
+    ctx.fillText('আনাস ফাইনান্সিয়াল স্টেটমেন্ট ও রিপোর্ট', 60, 90);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '500 20px system-ui, -apple-system, sans-serif';
+    const dateStr = new Date().toISOString().split('T')[0];
+    ctx.fillText(`রিপোর্ট তৈরির তারিখ: ${dateStr}   |   প্রস্তুতকারক: আনাস (Admin)`, 60, 135);
+
+    // Overall Summary Cards (3 Cards Side by Side)
+    const cardY = 220;
+    const cardW = 340;
+    const cardH = 150;
+    const cardGap = 30;
+
+    // Total Income
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, 60, cardY, cardW, cardH, 24, true, true, '#E2E8F0');
+    ctx.fillStyle = '#10B981';
+    ctx.font = 'bold 16px system-ui, sans-serif';
+    ctx.fillText('মোট আয় (Total Income)', 85, cardY + 45);
+    ctx.fillStyle = '#065F46';
+    ctx.font = 'bold 32px system-ui, sans-serif';
+    ctx.fillText(`৳${totalIncome.toLocaleString('bn-BD')}`, 85, cardY + 105);
+
+    // Total Expense
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, 60 + cardW + cardGap, cardY, cardW, cardH, 24, true, true, '#E2E8F0');
+    ctx.fillStyle = '#EF4444';
+    ctx.font = 'bold 16px system-ui, sans-serif';
+    ctx.fillText('মোট ব্যয় (Total Expense)', 60 + cardW + cardGap + 25, cardY + 45);
+    ctx.fillStyle = '#991B1B';
+    ctx.font = 'bold 32px system-ui, sans-serif';
+    ctx.fillText(`৳${totalExpense.toLocaleString('bn-BD')}`, 60 + cardW + cardGap + 25, cardY + 105);
+
+    // Net Savings
+    const netSavings = totalIncome - totalExpense;
+    ctx.fillStyle = netSavings >= 0 ? '#ECFDF5' : '#FEF2F2';
+    roundRect(ctx, 60 + (cardW + cardGap) * 2, cardY, cardW, cardH, 24, true, true, netSavings >= 0 ? '#A7F3D0' : '#FECACA');
+    ctx.fillStyle = netSavings >= 0 ? '#047857' : '#B91C1C';
+    ctx.font = 'bold 16px system-ui, sans-serif';
+    ctx.fillText('নীট সঞ্চয় / (ঘাটতি)', 60 + (cardW + cardGap) * 2 + 25, cardY + 45);
+    ctx.font = 'bold 32px system-ui, sans-serif';
+    ctx.fillText(`${netSavings >= 0 ? '+' : ''}৳${netSavings.toLocaleString('bn-BD')}`, 60 + (cardW + cardGap) * 2 + 25, cardY + 105);
+
+    // Business Profit & Loss Card
+    const bizY = 410;
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, 60, bizY, 1080, 220, 28, true, true, '#E2E8F0');
+
+    ctx.fillStyle = '#1E293B';
+    ctx.font = 'bold 24px system-ui, sans-serif';
+    ctx.fillText('💼 বিজনেস সেগমেন্ট - লাভ-ক্ষতি স্টেটমেন্ট', 95, bizY + 55);
+
+    // Biz 3 inner stats
+    const bizStatW = 320;
+    const bizStatY = bizY + 85;
+
+    // Biz Income
+    ctx.fillStyle = '#F8FAFC';
+    roundRect(ctx, 95, bizStatY, bizStatW, 95, 18, true, true, '#F1F5F9');
+    ctx.fillStyle = '#64748B'; ctx.font = 'bold 14px system-ui, sans-serif';
+    ctx.fillText('মোট বিজনেস বিক্রি / আয়', 115, bizStatY + 35);
+    ctx.fillStyle = '#059669'; ctx.font = 'bold 24px system-ui, sans-serif';
+    ctx.fillText(`৳${businessIncome.toLocaleString('bn-BD')}`, 115, bizStatY + 72);
+
+    // Biz Expense
+    roundRect(ctx, 95 + bizStatW + 20, bizStatY, bizStatW, 95, 18, true, true, '#F1F5F9');
+    ctx.fillStyle = '#64748B'; ctx.font = 'bold 14px system-ui, sans-serif';
+    ctx.fillText('মোট বিজনেস পরিচালন খরচ', 95 + bizStatW + 40, bizStatY + 35);
+    ctx.fillStyle = '#DC2626'; ctx.font = 'bold 24px system-ui, sans-serif';
+    ctx.fillText(`৳${businessExpense.toLocaleString('bn-BD')}`, 95 + bizStatW + 40, bizStatY + 72);
+
+    // Biz Net
+    roundRect(ctx, 95 + (bizStatW + 20) * 2, bizStatY, bizStatW, 95, 18, true, true, businessNetProfit >= 0 ? '#D1FAE5' : '#FEE2E2');
+    ctx.fillStyle = businessNetProfit >= 0 ? '#065F46' : '#991B1B'; ctx.font = 'bold 14px system-ui, sans-serif';
+    ctx.fillText('বিজনেস নীট লাভ / (ক্ষতি)', 95 + (bizStatW + 20) * 2 + 20, bizStatY + 35);
+    ctx.font = 'bold 24px system-ui, sans-serif';
+    ctx.fillText(`৳${businessNetProfit.toLocaleString('bn-BD')}`, 95 + (bizStatW + 20) * 2 + 20, bizStatY + 72);
+
+    // Category Breakdown Table
+    const tableY = 665;
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, 60, tableY, 1080, 720, 28, true, true, '#E2E8F0');
+
+    ctx.fillStyle = '#1E293B';
+    ctx.font = 'bold 24px system-ui, sans-serif';
+    ctx.fillText('📊 ক্যাটাগরি-ভিত্তিক খরচের তালিকা ও বিবরণী', 95, tableY + 55);
+
+    // Table Header
+    ctx.fillStyle = '#F1F5F9';
+    roundRect(ctx, 95, tableY + 80, 1010, 48, 12, true, false);
+    ctx.fillStyle = '#475569';
+    ctx.font = 'bold 16px system-ui, sans-serif';
+    ctx.fillText('ক্যাটাগরি নাম', 120, tableY + 110);
+    ctx.fillText('মোট খরচের পরিমাণ (৳)', 750, tableY + 110);
+
+    // Rows
+    let rowY = tableY + 155;
+    if (pieChartData.length === 0) {
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = 'bold 18px system-ui, sans-serif';
+      ctx.fillText('এখনো কোনো খরচের ডেটা যুক্ত করা হয়নি।', 120, rowY + 30);
+    } else {
+      pieChartData.slice(0, 8).forEach((cat, idx) => {
+        ctx.fillStyle = idx % 2 === 0 ? '#F8FAFC' : '#FFFFFF';
+        roundRect(ctx, 95, rowY - 25, 1010, 50, 10, true, false);
+
+        ctx.fillStyle = COLORS[idx % COLORS.length];
+        ctx.beginPath();
+        ctx.arc(125, rowY + 3, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#1E293B';
+        ctx.font = 'bold 18px system-ui, sans-serif';
+        ctx.fillText(cat.name, 150, rowY + 9);
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = 'bold 20px system-ui, sans-serif';
+        ctx.fillText(`৳${cat.value.toLocaleString('bn-BD')}`, 750, rowY + 9);
+
+        rowY += 60;
+      });
+    }
+
+    // Footer Stamp
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '500 16px system-ui, sans-serif';
+    ctx.fillText('🔒 স্বয়ংক্রিয় প্রস্তুতকৃত ডিজিটাল স্টেটমেন্ট  •  আনাস ফাইনান্সিয়াল ম্যানেজমেন্ট সিস্টেম', 60, height - 35);
+
+    // Trigger PNG Download
+    const link = document.createElement('a');
+    link.download = `anas_finance_statement_${dateStr}.png`;
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       
-      {/* Header & CSV Export */}
+      {/* Header & Export Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-800">রিপোর্ট ও প্রফিট/লস এনালিটিক্স</h1>
           <p className="text-xs text-slate-500 mt-0.5">আয়-ব্যয়ের ট্রেন্ড, বিজনেসের লাভ-ক্ষতি ও বিস্তারিত বিবরণী</p>
         </div>
 
-        <button
-          onClick={exportToCSV}
-          className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-md transition-all self-start sm:self-auto"
-        >
-          <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-          <span>ডেটা এক্সপোর্ট (CSV)</span>
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
+          <button
+            onClick={exportToImage}
+            className="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer"
+          >
+            <Image className="w-4 h-4 text-white" />
+            <span>ইমেজ রিপোর্ট ডাউনলোড (PNG)</span>
+          </button>
+
+          <button
+            onClick={exportToCSV}
+            className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <span>ডেটা এক্সপোর্ট (CSV)</span>
+          </button>
+        </div>
       </div>
 
       {/* Business Profit & Loss Card */}
