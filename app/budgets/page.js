@@ -23,11 +23,19 @@ export default function BudgetsPage({ refreshKey, onRefresh }) {
   const [deleteBudgetId, setDeleteBudgetId] = useState(null);
   const [deleteGoalId, setDeleteGoalId] = useState(null);
 
-  useEffect(() => {
+  const loadData = () => {
     setBudgets(StorageAdapter.getBudgets());
     setCategories(StorageAdapter.getCategories());
     setTransactions(StorageAdapter.getTransactions());
     setSavingsGoals(StorageAdapter.getSavingsGoals());
+  };
+
+  useEffect(() => {
+    loadData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('anas_storage_updated', loadData);
+      return () => window.removeEventListener('anas_storage_updated', loadData);
+    }
   }, [refreshKey]);
 
   const currentMonth = new Date().getMonth() + 1;

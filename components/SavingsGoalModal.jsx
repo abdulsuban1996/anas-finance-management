@@ -53,8 +53,12 @@ export default function SavingsGoalModal({ isOpen, onClose, onRefresh, depositGo
       StorageAdapter.saveSavingsGoals([newGoal, ...goals]);
     }
 
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   const handleAddDeposit = (e) => {
@@ -72,8 +76,12 @@ export default function SavingsGoalModal({ isOpen, onClose, onRefresh, depositGo
     });
 
     StorageAdapter.saveSavingsGoals(updatedGoals);
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   return (

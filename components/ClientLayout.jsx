@@ -23,6 +23,9 @@ export default function ClientLayout({ children }) {
 
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('anas_storage_updated'));
+    }
   };
 
   return (

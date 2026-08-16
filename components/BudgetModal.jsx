@@ -58,8 +58,12 @@ export default function BudgetModal({ isOpen, onClose, onRefresh, editItem = nul
       StorageAdapter.saveBudgets(updatedBudgets);
     }
 
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   return (

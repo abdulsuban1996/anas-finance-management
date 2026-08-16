@@ -22,11 +22,19 @@ export default function Home({ refreshKey, onRefresh }) {
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
 
-  useEffect(() => {
+  const loadData = () => {
     setAccounts(StorageAdapter.getAccounts());
     setTransactions(StorageAdapter.getTransactions());
     setCategories(StorageAdapter.getCategories());
     setLoans(StorageAdapter.getLoans());
+  };
+
+  useEffect(() => {
+    loadData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('anas_storage_updated', loadData);
+      return () => window.removeEventListener('anas_storage_updated', loadData);
+    }
   }, [refreshKey]);
 
   const totalBalance  = accounts.reduce((acc, a) => acc + (a.current_balance || 0), 0);

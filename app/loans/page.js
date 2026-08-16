@@ -16,8 +16,16 @@ export default function LoansPage({ refreshKey, onRefresh }) {
   const [editLoan, setEditLoan] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
-  useEffect(() => {
+  const loadData = () => {
     setLoans(StorageAdapter.getLoans());
+  };
+
+  useEffect(() => {
+    loadData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('anas_storage_updated', loadData);
+      return () => window.removeEventListener('anas_storage_updated', loadData);
+    }
   }, [refreshKey]);
 
   const filteredLoans = loans.filter(l => l.type === activeTab);

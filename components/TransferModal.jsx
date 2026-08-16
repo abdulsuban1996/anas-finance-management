@@ -57,8 +57,12 @@ export default function TransferModal({ isOpen, onClose, onRefresh }) {
 
     StorageAdapter.saveTransactions([transferTx, ...allTxs]);
     StorageAdapter.saveAccounts(updatedAccs);
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   return (

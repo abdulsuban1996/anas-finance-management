@@ -139,8 +139,12 @@ export default function TransactionModal({ isOpen, onClose, onRefresh, editItem 
       StorageAdapter.saveAccounts(allAccounts);
     }
 
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   return (

@@ -21,9 +21,17 @@ export default function ReportsPage({ refreshKey }) {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
+  const loadData = () => {
     setTransactions(StorageAdapter.getTransactions());
     setCategories(StorageAdapter.getCategories());
+  };
+
+  useEffect(() => {
+    loadData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('anas_storage_updated', loadData);
+      return () => window.removeEventListener('anas_storage_updated', loadData);
+    }
   }, [refreshKey]);
 
   // Aggregate monthly data for line/area chart

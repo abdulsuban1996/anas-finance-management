@@ -25,10 +25,18 @@ export default function TransactionsPage({ refreshKey, onRefresh }) {
   const [editTx,           setEditTx]           = useState(null);
   const [deleteConfirmId,  setDeleteConfirmId]  = useState(null);
 
-  useEffect(() => {
+  const loadData = () => {
     setTransactions(StorageAdapter.getTransactions());
     setCategories(StorageAdapter.getCategories());
     setAccounts(StorageAdapter.getAccounts());
+  };
+
+  useEffect(() => {
+    loadData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('anas_storage_updated', loadData);
+      return () => window.removeEventListener('anas_storage_updated', loadData);
+    }
   }, [refreshKey]);
 
   /* ── Filter ── */

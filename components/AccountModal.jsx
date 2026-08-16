@@ -66,8 +66,12 @@ export default function AccountModal({ isOpen, onClose, onRefresh, editItem = nu
       StorageAdapter.saveAccounts([...existingAccs, newAcc]);
     }
 
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   return (

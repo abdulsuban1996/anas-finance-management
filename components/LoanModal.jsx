@@ -75,8 +75,12 @@ export default function LoanModal({ isOpen, onClose, onRefresh, paymentLoan = nu
       StorageAdapter.saveLoans([newLoan, ...loans]);
     }
 
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   const handleAddPayment = (e) => {
@@ -105,8 +109,12 @@ export default function LoanModal({ isOpen, onClose, onRefresh, paymentLoan = nu
     });
 
     StorageAdapter.saveLoans(updatedLoans);
-    onRefresh();
-    onClose();
+    try {
+      if (typeof onRefresh === 'function') onRefresh();
+    } catch (e) {}
+    try {
+      if (typeof onClose === 'function') onClose();
+    } catch (e) {}
   };
 
   return (

@@ -15,8 +15,16 @@ export default function AccountsPage({ refreshKey, onRefresh }) {
   const [editAccount, setEditAccount] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
-  useEffect(() => {
+  const loadData = () => {
     setAccounts(StorageAdapter.getAccounts());
+  };
+
+  useEffect(() => {
+    loadData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('anas_storage_updated', loadData);
+      return () => window.removeEventListener('anas_storage_updated', loadData);
+    }
   }, [refreshKey]);
 
   const totalBalance = accounts.reduce((acc, a) => acc + (a.current_balance || 0), 0);
