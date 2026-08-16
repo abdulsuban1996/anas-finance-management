@@ -6,18 +6,33 @@ import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import TransactionModal from './TransactionModal';
 import TransferModal from './TransferModal';
+import LoginScreen from './LoginScreen';
+import { AuthAdapter } from '../lib/auth';
 
 export default function ClientLayout({ children }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const checkAuth = () => {
+    setIsAuthenticated(AuthAdapter.isAuthenticated());
+  };
+
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((reg) => console.log('PWA ServiceWorker registered:', reg.scope))
-        .catch((err) => console.log('ServiceWorker error:', err));
+    setIsMounted(true);
+    checkAuth();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('anas_auth_changed', checkAuth);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then((reg) => console.log('PWA ServiceWorker registered:', reg.scope))
+          .catch((err) => console.log('ServiceWorker error:', err));
+      }
+      return () => window.removeEventListener('anas_auth_changed', checkAuth);
     }
   }, []);
 
@@ -27,6 +42,14 @@ export default function ClientLayout({ children }) {
       window.dispatchEvent(new CustomEvent('anas_storage_updated'));
     }
   };
+
+  if (!isMounted) {
+    return <div className="min-h-screen bg-[#070f1e]" />;
+  }
+
+  if (!isAuthenticated) {
+    return <LoginScreen onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FB]">

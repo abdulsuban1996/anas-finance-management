@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, ArrowLeftRight, Landmark,
-  PieChart, HandCoins, Target, ShieldCheck, RotateCcw, Sparkles, X
+  PieChart, HandCoins, Target, ShieldCheck, RotateCcw, Sparkles, X, LogOut
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
@@ -136,6 +136,23 @@ export function SidebarContent({ onItemClick }) {
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>ডাটা রিক্লিয়ার / রিসেট</span>
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            if (confirm('আপনি কি লগআউট করতে চান?')) {
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('anas_fin_auth_session_v1');
+                window.dispatchEvent(new CustomEvent('anas_auth_changed'));
+              }
+            }
+          }}
+          className="w-full text-left text-xs font-extrabold text-rose-300 hover:text-rose-200 hover:bg-rose-500/20 p-2.5 rounded-xl border border-rose-500/25 transition-all flex items-center gap-2"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>লগআউট (Logout)</span>
         </motion.button>
       </motion.div>
     </div>
