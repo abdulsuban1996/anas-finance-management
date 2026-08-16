@@ -25,8 +25,8 @@ export default function RootLayout({ children }) {
     <html lang="bn">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icon.svg" />
+        <link rel="icon" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/icon.png" />
       </head>
       <body className="antialiased touch-manipulation">
         <ClientLayout>{children}</ClientLayout>
