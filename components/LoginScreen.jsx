@@ -6,8 +6,8 @@ import { Wallet, Lock, Mail, Eye, EyeOff, ShieldCheck, LogIn, AlertCircle } from
 import { AuthAdapter } from '../lib/auth';
 
 export default function LoginScreen({ onLoginSuccess }) {
-  const [email, setEmail] = useState('anas@gmail.com');
-  const [password, setPassword] = useState('anas');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function LoginScreen({ onLoginSuccess }) {
       } else {
         setErrorMsg(res.error || 'ইমেইল অথবা পাসওয়ার্ড সঠিক নয়!');
       }
-    }, 400);
+    }, 300);
   };
 
   return (
@@ -83,7 +83,7 @@ export default function LoginScreen({ onLoginSuccess }) {
               <input
                 type="email"
                 required
-                placeholder="anas@gmail.com"
+                placeholder="example@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white/10 border border-white/15 text-white placeholder-white/40 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400 transition-all"
@@ -99,7 +99,7 @@ export default function LoginScreen({ onLoginSuccess }) {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="••••••••"
+                placeholder="পাসওয়ার্ড লিখুন"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-3 rounded-2xl bg-white/10 border border-white/15 text-white placeholder-white/40 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400 transition-all"
@@ -114,19 +114,13 @@ export default function LoginScreen({ onLoginSuccess }) {
             </div>
           </div>
 
-          {/* Credentials Hint Box */}
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 text-[11px] text-emerald-200 leading-snug space-y-1">
-            <p className="font-bold">🔑 ডিফল্ট লগইন তথ্য:</p>
-            <p className="text-white/80">ইমেইল: <strong className="text-emerald-300">anas@gmail.com</strong> | পাসওয়ার্ড: <strong className="text-emerald-300">anas</strong></p>
-          </div>
-
           {/* Submit Button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -138,13 +132,6 @@ export default function LoginScreen({ onLoginSuccess }) {
             )}
           </motion.button>
         </form>
-
-        {/* Footer info */}
-        <div className="pt-2 text-center border-t border-white/10">
-          <p className="text-[11px] text-emerald-300 font-bold">
-            🔒 একবার লগইন করলেই স্থায়ীভাবে সবসময় সচল থাকবে
-          </p>
-        </div>
       </motion.div>
     </div>
   );
