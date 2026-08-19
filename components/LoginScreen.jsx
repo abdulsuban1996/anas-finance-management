@@ -140,12 +140,9 @@ export default function LoginScreen({ onLoginSuccess }) {
         </form>
 
         {/* Footer info */}
-        <div className="pt-2 text-center border-t border-white/10 space-y-0.5">
+        <div className="pt-2 text-center border-t border-white/10">
           <p className="text-[11px] text-emerald-300 font-bold">
-            📱 মোবাইল অ্যাপ: একবার লগইন করলেই স্থায়ীভাবে অ্যাক্সেস থাকবে।
-          </p>
-          <p className="text-[10px] text-white/40 font-medium">
-            🌐 ব্রাউজার: নিরাপত্তার জন্য প্রতিবার নতুন করে লগইন করতে হবে।
+            🔒 একবার লগইন করলেই স্থায়ীভাবে সবসময় সচল থাকবে
           </p>
         </div>
       </motion.div>

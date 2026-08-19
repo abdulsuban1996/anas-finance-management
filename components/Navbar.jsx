@@ -2,18 +2,11 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, PlusCircle, ArrowLeftRight, Menu, X, LogOut } from 'lucide-react';
+import { Wallet, PlusCircle, ArrowLeftRight, Menu, X } from 'lucide-react';
 import { SidebarContent } from './Sidebar';
-import { AuthAdapter } from '../lib/auth';
 
 export default function Navbar({ onOpenTransaction, onOpenTransfer }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const handleLogout = () => {
-    if (confirm('আপনি কি লগআউট করতে চান?')) {
-      AuthAdapter.logout();
-    }
-  };
 
   return (
     <>
@@ -92,18 +85,6 @@ export default function Navbar({ onOpenTransaction, onOpenTransfer }) {
                 <PlusCircle className="w-4 h-4" />
               </motion.div>
               <span>নতুন এন্ট্রি</span>
-            </motion.button>
-
-            {/* Logout Button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleLogout}
-              className="flex items-center gap-1 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-300 font-bold text-xs px-3 py-2 rounded-xl transition-all"
-              title="লগআউট"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">লগআউট</span>
             </motion.button>
           </motion.div>
         </div>
